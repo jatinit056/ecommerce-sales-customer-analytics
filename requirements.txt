@@ -1,0 +1,8 @@
+# Install with:  pip install -r requirements.txt
+# The notebook was run end to end with Python 3.13 + pandas 3.0.5 and re-run with pandas 2.2.3 (identical results).
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.8
+seaborn>=0.13
+jupyter>=1.0
+# SQL scripts call the PostgreSQL client (psql) — install PostgreSQL 13+ separately.

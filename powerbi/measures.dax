@@ -1,0 +1,106 @@
+// =====================================================================
+// DAX measures of powerbi/Ecommerce_Olist.pbix — table _Measures, grouped by display folder.
+// Copied from the model that the dashboard uses (same names, formulas and formats).
+// =====================================================================
+
+// ------------------------------------------------------------ Revenue
+Total Revenue =                        // format: "R$" #,0
+    CALCULATE ( SUM ( fact_orders[order_revenue] ), fact_orders[in_scope] = TRUE () )
+Product Revenue =                      // format: "R$" #,0
+    CALCULATE ( SUM ( fact_orders[product_revenue] ), fact_orders[in_scope] = TRUE () )
+Freight Revenue =                      // format: "R$" #,0
+    CALCULATE ( SUM ( fact_orders[freight_value] ), fact_orders[in_scope] = TRUE () )
+Delivered Orders =                     // format: #,0
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[in_scope] = TRUE () )
+Average Order Value =                  // format: "R$" #,0.00
+    DIVIDE ( [Total Revenue], [Delivered Orders] )
+Freight Share % =                      // format: 0.0%
+    DIVIDE ( [Freight Revenue], [Total Revenue] )
+
+// ------------------------------------------------------------ Customers
+Unique Customers =                     // format: #,0
+    CALCULATE ( DISTINCTCOUNT ( fact_orders[customer_unique_id] ), fact_orders[in_scope] = TRUE () )
+Revenue per Customer =                 // format: "R$" #,0.00
+    DIVIDE ( [Total Revenue], [Unique Customers] )
+Repeat Customers =                     // format: #,0
+    VAR CustomerOrders =
+        CALCULATETABLE (
+            ADDCOLUMNS ( VALUES ( fact_orders[customer_unique_id] ), "@orders", CALCULATE ( COUNTROWS ( fact_orders ) ) ),
+            fact_orders[in_scope] = TRUE ()
+        )
+    RETURN
+        COUNTROWS ( FILTER ( CustomerOrders, [@orders] >= 2 ) )
+Repeat Customer Rate =                 // format: 0.00%
+    DIVIDE ( [Repeat Customers], [Unique Customers] )
+
+// ------------------------------------------------------------ Delivery
+On-time Orders =                       // format: #,0
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[in_scope] = TRUE (), fact_orders[delivery_status] = "On time" )
+Late Orders =                          // format: #,0
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[in_scope] = TRUE (), fact_orders[delivery_status] = "Late" )
+On-time Delivery Rate =                // format: 0.0%
+    DIVIDE ( [On-time Orders], [On-time Orders] + [Late Orders] )
+Late Delivery Rate =                   // format: 0.0%
+    DIVIDE ( [Late Orders], [On-time Orders] + [Late Orders] )
+Avg Delivery Days =                    // format: 0.0
+    CALCULATE ( AVERAGE ( fact_orders[delivery_days] ), fact_orders[in_scope] = TRUE () )
+Avg Review Score =                     // format: 0.00
+    CALCULATE ( AVERAGE ( fact_orders[review_score] ), fact_orders[in_scope] = TRUE () )
+Avg Review (timed deliveries) =        // format: 0.00
+    CALCULATE ( [Avg Review Score], KEEPFILTERS ( NOT ISBLANK ( fact_orders[delivery_timing] ) ) )
+Low Review Share % =                   // format: 0.0%
+    DIVIDE ( CALCULATE ( [Delivered Orders], fact_orders[review_score] <= 2 ), [Delivered Orders] )
+
+// ------------------------------------------------------------ Cancellations
+Orders in Window =                     // format: #,0
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[in_analysis_window] = TRUE () )
+Canceled Orders =                      // format: #,0
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[in_analysis_window] = TRUE (), fact_orders[is_canceled] = TRUE () )
+Cancellation Rate =                    // format: 0.00%
+    DIVIDE ( [Canceled Orders], [Orders in Window] )
+
+// ------------------------------------------------------------ Time intelligence
+Revenue Previous Month =               // format: "R$" #,0
+    CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, MONTH ) )
+Revenue MoM % =                        // format: 0.0%
+    DIVIDE ( [Total Revenue] - [Revenue Previous Month], [Revenue Previous Month] )
+Revenue Same Period LY =               // format: "R$" #,0
+    CALCULATE ( [Total Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+Revenue YoY % =                        // format: 0.0%
+    DIVIDE ( [Total Revenue] - [Revenue Same Period LY], [Revenue Same Period LY] )
+Revenue YTD =                          // format: "R$" #,0
+    TOTALYTD ( [Total Revenue], 'Date'[Date] )
+Revenue 2017 (Jan-Aug) =               // format: "R$" #,0
+    CALCULATE ( [Total Revenue], 'Date'[Year] = 2017, 'Date'[Month Number] <= 8 )
+Revenue 2018 (Jan-Aug) =               // format: "R$" #,0
+    CALCULATE ( [Total Revenue], 'Date'[Year] = 2018, 'Date'[Month Number] <= 8 )
+
+// ------------------------------------------------------------ Categories
+Item Revenue =                         // format: "R$" #,0
+    CALCULATE ( SUM ( fact_order_items[item_revenue] ), fact_order_items[in_scope] = TRUE () )
+Items Sold =                           // format: #,0
+    CALCULATE ( COUNTROWS ( fact_order_items ), fact_order_items[in_scope] = TRUE () )
+Avg Item Price =                       // format: "R$" #,0.00
+    CALCULATE ( AVERAGE ( fact_order_items[price] ), fact_order_items[in_scope] = TRUE () )
+Category Revenue Share % =             // format: 0.0%
+    DIVIDE ( [Item Revenue], CALCULATE ( [Item Revenue], ALL ( fact_order_items[category] ) ) )
+Category Rank =                        // format: 0
+    IF ( HASONEVALUE ( fact_order_items[category] ), RANKX ( ALL ( fact_order_items[category] ), [Item Revenue], , DESC, DENSE ) )
+Item Revenue (Top 10) =                // format: "R$" #,0
+    IF ( [Category Rank] <= 10, [Item Revenue] )
+
+// ------------------------------------------------------------ Revenue
+Revenue (Top 10 States) =              // format: "R$" #,0
+    VAR StateRank = RANKX ( ALLSELECTED ( dim_state ), [Total Revenue], , DESC, DENSE )
+    RETURN
+        IF ( NOT ISBLANK ( [Total Revenue] ) && StateRank <= 10, [Total Revenue] )
+
+// ------------------------------------------------------------ Segments
+Segment Customers =                    // format: #,0
+    COUNTROWS ( dim_customers )
+Segment Revenue =                      // format: "R$" #,0
+    SUM ( dim_customers[total_revenue] )
+Segment Customer Share % =             // format: 0.0%
+    DIVIDE ( [Segment Customers], CALCULATE ( [Segment Customers], ALL ( dim_customers[segment] ) ) )
+Segment Revenue Share % =              // format: 0.0%
+    DIVIDE ( [Segment Revenue], CALCULATE ( [Segment Revenue], ALL ( dim_customers[segment] ) ) )

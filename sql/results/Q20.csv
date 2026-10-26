@@ -1,0 +1,6 @@
+segment,customers,customer_share_pct,revenue,revenue_share_pct,avg_spend,avg_recency_days
+High-value recent,10882,11.69,4235032.15,27.55,389.18,114.1
+High-value lapsed,10631,11.42,4167155.02,27.11,391.98,366.1
+Regular recent,34259,36.80,3063583.04,19.93,89.42,114.3
+Regular lapsed,34543,37.10,3046816.61,19.82,88.20,364.9
+Repeat customers,2789,3.00,860533.19,5.60,308.55,222.1

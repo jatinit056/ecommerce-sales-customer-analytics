@@ -1,0 +1,13 @@
+,rows
+carrier pickup before purchase,166
+delivered to customer before carrier pickup,23
+delivered before purchase,0
+status 'delivered' but no delivery date,8
+status 'canceled' but has a delivery date,6
+orders with no items,775
+orders with no payment record,1
+payments with value 0,9
+payments with type 'not_defined',3
+payments with 0 installments,2
+items with freight = 0 (free shipping),383
+categories missing an English name,2

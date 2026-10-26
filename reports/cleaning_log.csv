@@ -1,0 +1,13 @@
+step,table,rows_affected,action
+Convert 5 order timestamp columns to datetime,orders,99441,type conversion
+Convert shipping_limit_date to datetime,items,112650,type conversion
+Rename misspelled columns (lenght -> length),products,0,standardisation (column names)
+Add English names for 2 untranslated categories,category_translation,2,manual mapping
+Fix 4 misspelled English category names (e.g. fashio -> fashion),category_translation,4,standardisation
+Fill missing product category with 'Unknown',products,610,fill missing
+Standardise seller city names,sellers,25,standardisation
+Keep latest review per order (drop older duplicates),reviews,559,de-duplication
+Set payment_installments 0 -> 1,payments,2,invalid value fix
+Keep 'not_defined' payment type as its own label (value R$0),payments,3,kept + documented
+"Flag orders with timestamp/status conflicts (kept, not removed)",orders,203,flag
+Exclude orders outside Jan 2017-Aug 2018 from KPIs (kept in file),orders,349,scope flag

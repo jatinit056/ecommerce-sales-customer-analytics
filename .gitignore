@@ -1,0 +1,22 @@
+# Python / Jupyter
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Office / LibreOffice temporary and lock files
+~$*
+.~lock.*#
+
+# Power BI temporary files (commit the .pbix itself)
+*.pbix.bak
+.pbi/

@@ -1,0 +1,5 @@
+delivery_status,orders,avg_review_score,pct_1_or_2_stars
+1. 8+ days early,71046,4.31,9.21
+2. 0-7 days early,18626,4.18,10.70
+3. 1-7 days late,3671,2.69,49.93
+4. 8+ days late,2860,1.69,79.48
